@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Core.Data;
+using Gameplay.Card;
 using Gameplay.Character;
-using UI.Card;
 using UI.Combat.Character;
 using UnityEngine;
 using Util.Extension;
@@ -14,7 +14,7 @@ namespace UI.Combat.ActionAnimator{
 		[SerializeField] private float returnTime = 0.05f;
 		[SerializeField] private float puncture = 0.3f;
 
-		protected override IEnumerator PlayInternal(CharacterDrawer s, CardDrawer c){
+		protected override IEnumerator PlayInternal(CharacterDrawer s, CardBase c){
 			Vector3 start = s.transform.position;
 			Vector3 targetPos = s.CharacterBase is PlayerBase ? start.WithX(10) : start.WithX(-10);
 			Vector3 dashPos = Vector3.Lerp(start, targetPos, puncture);

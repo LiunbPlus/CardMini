@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using UI.Card;
+using Gameplay.Card;
 using UI.Combat.Character;
 using UnityEngine;
 
@@ -7,12 +7,12 @@ namespace Core.Data{
 	public abstract class CardAnimator : ScriptableObject{
 		protected bool isInterrupted = false;
 
-		public IEnumerator Play(CharacterDrawer s, CardDrawer c){
+		public IEnumerator Play(CharacterDrawer s, CardBase c){
 			isInterrupted = false;
 			yield return PlayInternal(s, c);
 		}
 
-		protected abstract IEnumerator PlayInternal(CharacterDrawer s, CardDrawer c);
+		protected abstract IEnumerator PlayInternal(CharacterDrawer s, CardBase c);
 
 		// 外部调用中断动画
 		public void Interrupt() => isInterrupted = true;
