@@ -27,13 +27,13 @@ id : 卡牌id，应全局唯一，使用数字，局内添加卡牌时使用此i
 name，desc: 卡牌名称和简介，显示在卡面上，不参与逻辑
 	<default>：此占位符会在显示时被替换为每个效果组合成的介绍
 cost：费用，非负整数
-cardType:卡牌类型，取值范围：["Attack", "Magic", "Terrain"] = [0,1,2]
-rarity：稀有度，取值范围：["Common","Rare","Epic","Basic"] = [0,1,2,3]
+cardType:卡牌类型，取值范围：["Attack", "Magic", "Terrain"] = [1,2,3]
+rarity：稀有度，取值范围：["Common","Rare","Epic","Basic"] = [1,2,3,4]
 img: 卡图文件路径
 anim：动画id，英语，具体的动画id需要在Unity内查看Resources/ActionAnimator内的文件，文件名即为id
 actions：卡牌效果，包括造成伤害、获得格挡、回血、获得buff等等
 	type：效果类型，当前取值范围："Action"+["Damage","AddBuff","Defense","Heal"]，更多功能需要逻辑支持
-	target: 目标，取值范围：["Self","OneEnemy","AllEnemy"]，分别代表自己（不选择目标）、1名敌人（选择目标），所有敌人（不选择目标）
+	target: 目标，取值范围：["Self","Other","All"] = [1,2,3]，分别代表自己（不选择目标）、1名敌人（选择目标），所有敌人（不选择目标）
 	value：通用数值，如攻击伤害，格挡量、buff层数
 	buff：AddBuff使用的buff类型，当前取值范围："Buff"+["Strength","Poison"]，更多功能需要逻辑支持
 

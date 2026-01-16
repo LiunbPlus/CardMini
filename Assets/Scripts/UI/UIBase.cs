@@ -5,8 +5,7 @@ namespace UI{
 	public abstract class UIBase : MonoBehaviour{
 		public bool IsVisible{get; private set;}
 		protected static UIManager UI => UIManager.Instance;
-
-		protected int OperateLayer{get; set;}
+		protected virtual int OperateLayer => 0;
 		private Button[] _buttons;
 		private bool _isValid;
 

@@ -17,10 +17,11 @@ namespace Gameplay.Buff{
 	}
 
 	public abstract class BuffBase{
-		public string Name => BuffData.Name;
-		public string Description => BuffData.description;
-		public BuffKind BuffKind => BuffData.kind;
-		public int MaxStacks => BuffData.maxStacks;
+		public int Id => BuffData.id;
+		public string Name => BuffData.name;
+		public string Description => BuffData.desc;
+		public BuffKind BuffKind => (BuffKind)(1 << BuffData.kind);
+		public int MaxStacks => BuffData.maxStack;
 
 		/// Buff 携带的修饰符列表
 		internal readonly List<StatModifier> modifiers = new();
@@ -29,11 +30,11 @@ namespace Gameplay.Buff{
 		public int Stack{get; set;}
 		protected CharacterBase Owner{get;}
 
-		protected BuffBase(CharacterBase owner, int stack){
+		protected BuffBase(int id, CharacterBase owner, int stack){
 			Owner = owner;
 			Stack = stack;
 
-			BuffData = DataManager.Instance.BuffData.GetData(GetType().Name);
+			BuffData = DataManager.BuffData.GetData(id);
 		}
 
 		/// 游戏开始
@@ -69,13 +70,13 @@ namespace Gameplay.Buff{
 		}
 
 		public bool TickDuration(){
-			if(BuffKind==BuffKind.Passive) return false;
+			if(BuffKind == BuffKind.Passive) return false;
 			Stack--;
 			return Stack <= 0;
 		}
 
 		public override string ToString(){
-			return $"{Name} {Stack} ({(BuffKind==BuffKind.Passive ? "∞" : Stack)})";
+			return $"{Name} {Stack} ({(BuffKind == BuffKind.Passive ? "∞" : Stack)})";
 		}
 	}
 }

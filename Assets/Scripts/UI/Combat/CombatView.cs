@@ -17,15 +17,17 @@ namespace UI.Combat{
 		[SerializeField] private Button exhaustPileButton;
 		[SerializeField] private Button drawCardButton;
 		[SerializeField] private Button changeCardButton;
+
 		[SerializeField] private CharacterDrawer playerDrawer;
 		[SerializeField] private CharacterDrawer enemyDrawer;
 
 		[Header("Card")] [SerializeField] private CardDrawer cardDrawerPrefab;
 		[SerializeField] private Transform cardDrawerContent;
+		[SerializeField] private CardSlotDrawer slotDrawer;
 
+		protected override int OperateLayer => 0;
 		private readonly PileController _pile = PileController.Instance;
 		private readonly CombatController _combat = CombatController.Instance;
-		private CardDrawer _targetingCard;
 
 		private ItemPool<CardDrawer> _cardPool;
 		private List<CardDrawer> _choseCards;
@@ -49,8 +51,11 @@ namespace UI.Combat{
 
 			_combat.OnPlayerSpawn += OnPlayerSpawn;
 			_combat.OnEnemySpawn += OnEnemySpawn;
+			_combat.OnUseCardOnTarget += UseCardAnim;
 
 			TurnController.Instance.OnTurnStart += OnTurnIn;
+			TurnController.Instance.OnBattleStart += OnBattleStart;
+			TurnController.Instance.OnBattleEnd += OnBattleEnd;
 
 			drawCardButton.onClick.AddListener(OnDrawCardButton);
 			changeCardButton.onClick.AddListener(OnChangeCardButton);
@@ -73,8 +78,11 @@ namespace UI.Combat{
 
 			_combat.OnPlayerSpawn -= OnPlayerSpawn;
 			_combat.OnEnemySpawn -= OnEnemySpawn;
+			_combat.OnUseCardOnTarget -= UseCardAnim;
 
 			TurnController.Instance.OnTurnStart -= OnTurnIn;
+			TurnController.Instance.OnBattleStart -= OnBattleStart;
+			TurnController.Instance.OnBattleEnd -= OnBattleEnd;
 
 			drawCardButton.onClick.RemoveListener(OnDrawCardButton);
 			changeCardButton.onClick.RemoveListener(OnChangeCardButton);
@@ -106,7 +114,16 @@ namespace UI.Combat{
 
 		private void OnPlayerDeath(CharacterBase c){
 			playerDrawer.Hide();
+			playerDrawer.SetBase(null);
 			c.OnDeath -= OnPlayerDeath;
+		}
+
+		private IEnumerator UseCardAnim(CharacterBase ch, CardBase card){
+			if(ch is PlayerBase){
+				yield return playerDrawer.UseCardOnTarget(card);
+			} else if(ch is EnemyBase){
+				yield return enemyDrawer.UseCardOnTarget(card);
+			}
 		}
 		#endregion
 
@@ -149,6 +166,10 @@ namespace UI.Combat{
 			d.OnChoose -= OnChooseCard;
 			_cardDrawers.Remove(c);
 		}
+
+		public CardSlotItem GetFirstValidSlot(){
+			return slotDrawer.GetFirstItem();
+		}
 		#endregion
 
 		#region Button
@@ -164,40 +185,50 @@ namespace UI.Combat{
 
 		private void OnNextTurnClick(){
 			nextTurnButton.interactable = false;
-			StartCoroutine(UseCardAnim());
-		}
-
-		private IEnumerator UseCardAnim(){
-			foreach(CardDrawer choseCard in _choseCards){
-				yield return playerDrawer.UseCardOnTarget(choseCard);
-				CombatController.CommitCard(playerDrawer.CharacterBase, enemyDrawer.CharacterBase, choseCard.CardBase);
-				yield return new WaitForSeconds(0.5f);
-			}
-
-			TurnController.Instance.NextTurn();
+			StartCoroutine(_combat.NextTurn());
 		}
 
 		private void OnDrawPileButtonClick(){
-			var b = UI.BagView;
+			var b = UI.BagDrawer;
 			if(b == null) return;
 			b.SetPiles(_pile.GetDrawPile());
 		}
 
 		private void OnDropPileButtonClick(){
-			var b = UI.BagView;
+			var b = UI.BagDrawer;
 			if(b == null) return;
 			b.SetPiles(_pile.GetDropPile());
 		}
 
 		private void OnExhaustPileButtonClick(){
-			var b = UI.BagView;
+			var b = UI.BagDrawer;
 			if(b == null) return;
 			b.SetPiles(_pile.GetExhaustPile());
 		}
 
 		private void OnTurnIn(int x){
-			if(x != 0) return;
-			nextTurnButton.interactable = true;
+			if(x == 0){
+				nextTurnButton.interactable = true;
+			} else{
+				// 敌方回合
+				StartCoroutine(_combat.NextTurn());
+			}
+		}
+
+		private void OnBattleEnd(){
+			slotDrawer.Clear();
+
+			foreach((CardBase c, CardDrawer d) in _cardDrawers){
+				_cardPool.ReturnItemToPool(d);
+				d.SetCardBase(null);
+				d.OnChoose -= OnChooseCard;
+			}
+
+			_cardDrawers.Clear();
+		}
+
+		private void OnBattleStart(){
+			slotDrawer.SpawnItem(_combat.GetSlotCount());
 		}
 		#endregion
 	}

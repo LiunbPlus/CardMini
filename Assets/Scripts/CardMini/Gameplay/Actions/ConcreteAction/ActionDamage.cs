@@ -24,19 +24,21 @@ namespace Gameplay.Actions{
 
 		public override void Apply(){
 			if(!FlagCheck()) return;
-			if(isSingleTarget){
-				target[0]?.DealDamage(_calcValue, source);
-			} else{
-				target.ForEach(t => {
-					if(t==null) return;
-					int v = t.BuffController.CalcModify(ModifierType.DamageInput, _calcValue);
-					t.DealDamage(v, source);
-				});
+			for(int i = 0; i < count; ++i){
+				if(isSingleTarget){
+					target[0]?.DealDamage(_calcValue, source);
+				} else{
+					target.ForEach(t => {
+						if(t == null) return;
+						int v = t.BuffController.CalcModify(ModifierType.DamageInput, _calcValue);
+						t.DealDamage(v, source);
+					});
+				}
 			}
 		}
 
 		public override string GetPreviewText(){
-			return $"{targetType.GetTypeDesc()}造成{_calcValue}点伤害";
+			return $"{targetType.GetTypeDesc()}造成{_calcValue}点伤害{(count > 1 ? count+"次" : "")}";
 		}
 	}
 }

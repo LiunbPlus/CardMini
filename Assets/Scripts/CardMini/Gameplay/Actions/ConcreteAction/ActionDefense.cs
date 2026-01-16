@@ -26,19 +26,21 @@ namespace Gameplay.Actions{
 
 		public override void Apply(){
 			if(!FlagCheck()) return;
-			if(isSingleTarget){
-				target[0]?.ChangeDefense(_calcValue, source);
-			} else{
-				target.ForEach(e => {
-					if(e == null) return;
-					int v = e.BuffController.CalcModify(ModifierType.DefenseOutput, _calcValue);
-					e.ChangeDefense(v, source);
-				});
+			for(int i = 0; i < count; ++i){
+				if(isSingleTarget){
+					target[0]?.ChangeDefense(_calcValue, source);
+				} else{
+					target.ForEach(e => {
+						if(e == null) return;
+						int v = e.BuffController.CalcModify(ModifierType.DefenseOutput, _calcValue);
+						e.ChangeDefense(v, source);
+					});
+				}
 			}
 		}
 
 		public override string GetPreviewText(){
-			return $"{targetType.GetTypeDesc()}获得{_calcValue}格挡";
+			return $"{targetType.GetTypeDesc()}获得{_calcValue}格挡{(count > 1 ? count+"次" : "")}";
 		}
 	}
 }

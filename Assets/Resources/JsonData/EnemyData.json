@@ -1,0 +1,23 @@
+﻿{
+  "list": [
+    {
+      "id": 4001,
+      "name": "E1",
+      "desc": "desc",
+      "img": "enemy1",
+      "hp": 20,
+      "maxHp": 20,
+      "pool": 1,
+      "intents": [
+        {
+          "id": 2001,
+          "weight": 2
+        },
+        {
+          "id": 2002,
+          "weight": 10
+        }
+      ]
+    }
+  ]
+}

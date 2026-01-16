@@ -1,26 +1,26 @@
 ﻿using Controller;
 using Core.Data;
-using Gameplay.Buff;
 using Gameplay.Card;
 
 namespace Gameplay.Actions{
 	public class ActionAddBuff : ActionBase{
-		private readonly BuffType _type;
+		private readonly BuffData _data;
 		private readonly int _stack;
 
 		public ActionAddBuff(ActionData data) : base(data){
-			_type = data.buffType;
+			_data = DataManager.BuffData.GetData(data.buff);
 			_stack = data.value;
 		}
 
 		public override void Apply(){
 			if(!FlagCheck()) return;
-			target.ForEach(t => t.BuffController.AddBuff(_type, _stack));
+			for(int i = 0; i < count; ++i){
+				target.ForEach(t => t.BuffController.AddBuff(_data.id, _stack));
+			}
 		}
 
 		public override string GetPreviewText(){
-			BuffData data = DataManager.Instance.BuffData.GetData(_type.ToString());
-			return $"{targetType.GetTypeDesc()}给予{_stack}层{data.Name})";
+			return $"{targetType.GetTypeDesc()}给予{_stack}层{_data.name}{(count > 1 ? count + "次" : "")}";
 		}
 	}
 }

@@ -27,13 +27,14 @@ namespace UI{
 		internal int CurrentOperateLayer{get; private set;}
 		/*
 		 * 0 - Combat -> HandCard, Player Enemy, Shop; State
-		 * 1 - Bag; Map; Reward;
-		 * 2 - Menu; CardReward
+		 * 1 - Reward;
+		 * 2 - Map, Bag, CardReward
+		 * 3 - Menu
 		 */
 
 		public CombatView CombatView{get; private set;}
 		public RewardCardView RewardCardView{get; private set;}
-		public BagView BagView{get; private set;}
+		public BagDrawer BagDrawer{get; private set;}
 		public MapView MapView{get; private set;}
 		public MenuView MenuView{get; private set;}
 
@@ -56,7 +57,7 @@ namespace UI{
 
 		public void ChangeScene(string s){
 			SceneManager.LoadScene(s);
-			BagView = FindObjectOfType<BagView>();
+			BagDrawer = FindObjectOfType<BagDrawer>();
 			MapView = FindObjectOfType<MapView>();
 			CombatView = FindObjectOfType<CombatView>();
 			RewardCardView = FindObjectOfType<RewardCardView>();

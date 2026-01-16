@@ -1,16 +1,26 @@
-﻿using Gameplay.Buff;
-using UnityEngine;
+﻿using System;
 
 namespace Core.Data{
-	[CreateAssetMenu(fileName = "BuffData", menuName = "CardMini/Buff Data")]
-	public class BuffData : ScriptableObject{
-		[Header("基本信息")]
-		public string Name = "名称";
-		[TextArea]public string description = "简介";
+	[Serializable]
+	public class BuffData : Data{
+		public string cls;
+		public string name;
+		public string desc;
+		public int maxStack;
+		public int kind;
+		public string img;
 
-		[Header("基础属性")]
-		public Sprite image;
-		public BuffKind kind;
-		public int maxStacks = 99;
+		public BuffData(int id, string name, string desc, int maxStack, int kind, string img, string cls) : base(id){
+			this.name = name;
+			this.desc = desc;
+			this.maxStack = maxStack;
+			this.kind = kind;
+			this.img = img;
+			this.cls = cls;
+		}
+
+		public override string ToString(){
+			return $"{id} {name}";
+		}
 	}
 }

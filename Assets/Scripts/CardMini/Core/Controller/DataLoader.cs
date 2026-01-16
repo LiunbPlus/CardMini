@@ -23,5 +23,6 @@ namespace Controller{
 		public Dictionary<string, T> GetAllData() => _idToData;
 
 		public int DataCount => _idToData.Count;
+		public T this[string id] => GetData(id);
 	}
 }

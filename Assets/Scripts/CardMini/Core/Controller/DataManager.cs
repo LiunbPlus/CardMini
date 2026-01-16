@@ -1,22 +1,29 @@
 ﻿using Core.Data;
 
 namespace Controller{
-	public class DataManager{
-		private static DataManager instance;
-		public static DataManager Instance => instance ??= new ();
+	public static class DataManager{
+		public static DataLoader<ImageData> ImageData{get; private set;}
+		public static JsonLoader<PlayerData> PlayerData{get; private set;}
+		public static JsonLoader<CardData> CardData{get; private set;}
+		public static JsonLoader<EnemyData> EnemyData{get; private set;}
+		public static JsonLoader<IntentData> IntentData{get; private set;}
+		public static JsonLoader<BuffData> BuffData{get; private set;}
+		public static ImageLoader<BuffData> BuffImageData{get; private set;}
+		public static ImageLoader<CardData> CardImageData{get; private set;}
+		public static ImageLoader<PlayerData> PlayerImageData{get; private set;}
+		public static ImageLoader<EnemyData> EnemyImageData{get; private set;}
 
-		public DataLoader<ImageData> ImageData{get; private set;}
-		public DataLoader<PlayerData> PlayerData{get; private set;}
-		public DataLoader<EnemyData> EnemyData{get; private set;}
-		public DataLoader<EnemyPoolData> EnemyPoolData{get; private set;}
-		public DataLoader<BuffData> BuffData{get; private set;}
-
-		public void Init(){
+		public static void Init(){
 			ImageData = new DataLoader<ImageData>();
-			PlayerData = new DataLoader<PlayerData>();
-			EnemyData = new DataLoader<EnemyData>();
-			EnemyPoolData = new DataLoader<EnemyPoolData>();
-			BuffData = new DataLoader<BuffData>();
+			CardData = new JsonLoader<CardData>();
+			IntentData = new JsonLoader<IntentData>();
+			EnemyData = new JsonLoader<EnemyData>();
+			PlayerData = new JsonLoader<PlayerData>();
+			BuffData = new JsonLoader<BuffData>();
+			BuffImageData = new ImageLoader<BuffData>();
+			CardImageData = new ImageLoader<CardData>();
+			PlayerImageData = new ImageLoader<PlayerData>();
+			EnemyImageData = new ImageLoader<EnemyData>();
 		}
 	}
 }

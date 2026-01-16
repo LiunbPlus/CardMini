@@ -1,4 +1,5 @@
 ﻿using System;
+using Controller;
 using Core.Data;
 
 namespace Gameplay.Character{
@@ -12,14 +13,17 @@ namespace Gameplay.Character{
 
 		public PlayerBase(PlayerData data) : base(data){
 			Team = 0;
-			Coin = data.initCoin;
-			HandCount = data.maxHandCard;
+			PileController.Instance.InitCards(data.initCards);
+
+			Coin = data.coin;
+			HandCount = data.maxHand;
 		}
 
 		public void ChangeCoin(int amount, CharacterBase source){
 			int originalValue = Coin;
 
 			// 应用上下限
+			Coin += amount;
 			if(Coin < 0) Coin = 0;
 
 			// 触发事件
@@ -27,11 +31,21 @@ namespace Gameplay.Character{
 			OnCoinChange?.Invoke(this, delta);
 		}
 
+		public override void OnBattleStart(){
+			base.OnBattleStart();
+			Energy = 0;
+		}
+
+		public override void OnBattleEnd(){
+			base.OnBattleEnd();
+			Energy = 0;
+		}
+
 		public void ChangeEnergy(int amount, CharacterBase source){
 			int originalValue = Energy;
 
 			// 应用上下限
-			if(Energy < 0) Energy = 0;
+			Energy = Math.Clamp(Energy + amount, 0, 5);
 
 			// 触发事件
 			int delta = Energy - originalValue;

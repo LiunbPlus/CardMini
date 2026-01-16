@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Gameplay.Map{
 	public enum MapNodeType{
 		Enemy,
-		Treasure,
 		Shop,
-		Question,
 		Elite,
 		Boss,
 	}
@@ -14,7 +11,7 @@ namespace Gameplay.Map{
 	public class MapNode{
 		public bool IsValid{get; internal set;}
 		internal MapNodeType NodeType{get;private set;}
-		private List<MapNode> _nextNode;
+		private readonly List<MapNode> _nextNode;
 
 		internal MapNode(MapNodeType type, List<MapNode> nextNode){
 			NodeType = type;

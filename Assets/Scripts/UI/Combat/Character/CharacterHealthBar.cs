@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Combat.Character{
-	public class CharacterHealthBar : MonoBehaviour{
+	public class CharacterHealthBar : UIBase{
 		[Tooltip("（最上方的）动态血量")]
 		[SerializeField]
 		private Image hpImg;
@@ -14,8 +14,9 @@ namespace UI.Combat.Character{
 		[SerializeField]
 		private Image pImg;
 
-		private float _health;
-		private float _maxHealth;
+		protected override int OperateLayer => 0;
+		private int _health;
+		private int _maxHealth;
 		[Tooltip("动态持续时间")] public float effectTime = 0.8f;
 
 		private Coroutine _updateCoroutine;
@@ -25,12 +26,12 @@ namespace UI.Combat.Character{
 			UpdateHealthBar();
 		}
 
-		public void ChangeHealth(float addend){
+		public void ChangeHealth(int addend){
 			if(addend == 0) return;
 
-			_health = Mathf.Clamp(_health + addend, 0f, _maxHealth);
+			_health = Mathf.Clamp(_health + addend, 0, _maxHealth);
 
-			pImg.fillAmount = _health / _maxHealth;
+			pImg.fillAmount = (float)_health / _maxHealth;
 			hpImg.fillAmount = Mathf.Clamp(hpImg.fillAmount, 0f, pImg.fillAmount);
 			wImg.fillAmount = Mathf.Clamp(wImg.fillAmount, pImg.fillAmount, 1f);
 

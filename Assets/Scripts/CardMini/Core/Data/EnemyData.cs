@@ -1,32 +1,23 @@
-﻿using UnityEngine;
+﻿using System;
 
 namespace Core.Data{
-	[CreateAssetMenu(menuName = "CardMini/Enemy Data")]
+	[Serializable]
 	public class EnemyData : CharacterData{
-		[SerializeField] public int intentCount;
+		public int pool;
+		public IntentWeight[] intents;
+
+		public EnemyData
+			(int id, string name, string desc, int hp, int maxHp, int pool, IntentWeight[] intents, string img) : base(id, name,
+			desc, hp, maxHp, img){
+			this.pool = pool;
+			this.intents = intents;
+		}
+
+	}
+
+	[Serializable]
+	public class IntentWeight{
+		public int id;
+		public int weight;
 	}
 }
-
-/*
- * EnemyData
- * intents [
- *	{
- *		int id
- *		int weight
- *	},
- *	{
- *		int id
- *		int weight
- *	}
- * ]
- */
-
-/*
- * InteneData [
- *	{
- *		int id
- *		[int, int, int, int]
- *	},
- *
- * ]
- */

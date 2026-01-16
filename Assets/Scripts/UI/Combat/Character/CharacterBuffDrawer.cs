@@ -1,0 +1,44 @@
+﻿using System.Collections.Generic;
+using Gameplay.Buff;
+using UnityEngine;
+using Util;
+
+namespace UI.Combat.Character{
+	public class CharacterBuffDrawer : UIBase{
+		[SerializeField] private CharacterBuffItem itemPrefab;
+		[SerializeField] private RectTransform content;
+
+		protected override int OperateLayer => 0;
+
+		private Dictionary<string, CharacterBuffItem> _activeItems;
+		private ItemPool<CharacterBuffItem> _pool;
+
+		private void Awake(){
+			_activeItems = new();
+			_pool = new ItemPool<CharacterBuffItem>(itemPrefab, content);
+		}
+
+		public void SetItem(BuffBase buff){
+			var key = buff.BuffData.name;
+
+			// Buff 失效：回收
+			if(buff.Stack <= 0 && _activeItems.TryGetValue(key, out var item)){
+				_activeItems.Remove(key);
+				_pool.ReturnItemToPool(item);
+				return;
+			}
+
+			// Buff 已存在：刷新
+			if(_activeItems.TryGetValue(key, out var exist)){
+				exist.SetBuff(buff);
+				return;
+			}
+
+			// 新 Buff：从池中取
+			var ii = _pool.GetItemFromPool();
+			ii.SetBuff(buff);
+			_activeItems.Add(key, ii);
+		}
+
+	}
+}

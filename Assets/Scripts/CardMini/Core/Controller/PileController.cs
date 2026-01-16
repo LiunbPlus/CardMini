@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Gameplay.Card;
-using Gameplay.Character;
 using UnityEngine;
 
 namespace Controller{
@@ -26,8 +25,8 @@ namespace Controller{
 
 		private int _handCount = 0;
 
-		public void SetPlayer(PlayerBase player, int seed){
-			_handCount = player.HandCount;
+		public void SetPlayer(int handCount, int seed){
+			_handCount = handCount;
 			_rng = new System.Random(seed);
 		}
 
@@ -39,10 +38,18 @@ namespace Controller{
 			_exhaustPile = new();
 
 			TurnController.Instance.OnBattleStart += OnBattleStart;
+			TurnController.Instance.OnBattleEnd += Reset;
 		}
 
 		private void Deposit(){
 			TurnController.Instance.OnBattleStart -= OnBattleStart;
+			TurnController.Instance.OnBattleEnd -= Reset;
+		}
+
+		public void InitCards(IEnumerable<int> ids){
+			foreach(int id in ids){
+				_allCards.Add(new CardBase(DataManager.CardData[id]));
+			}
 		}
 
 		public void AddToCardBag(CardBase newCard){
@@ -59,11 +66,11 @@ namespace Controller{
 		}
 
 		/// <summary>
-		/// 获取抽牌堆的牌，排列顺序为牌名
+		/// 获取抽牌堆的牌，排列顺序为id
 		/// </summary>
 		/// <returns>排序列表</returns>
 		public List<CardBase> GetDrawPile(){
-			return _drawPile.OrderBy(i => i.Name).ToList();
+			return _drawPile.OrderBy(i => i).ToList();
 		}
 
 		public List<CardBase> GetDropPile(){
@@ -131,7 +138,6 @@ namespace Controller{
 		/// </summary>
 		public void GiveCard(CardBase card){
 			_handCards.Add(card);
-			if(_handCount > 0) card.SetSource(GameManager.Instance.Player);
 			OnGive?.Invoke(card);
 		}
 
@@ -140,7 +146,6 @@ namespace Controller{
 		/// </summary>
 		public void RemoveCard(CardBase card){
 			_handCards.Remove(card);
-			card.SetSource(null);
 			OnRemove?.Invoke(card);
 		}
 
@@ -167,6 +172,16 @@ namespace Controller{
 			RemoveCard(card);
 			DropCard(card);
 			DrawCard();
+		}
+
+		/// <summary>
+		/// 清空所有牌堆
+		/// </summary>
+		public void Reset(){
+			_handCards.Clear();
+			_drawPile.Clear();
+			_dropPile.Clear();
+			_exhaustPile.Clear();
 		}
 	}
 }

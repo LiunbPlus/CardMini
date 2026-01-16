@@ -2,7 +2,7 @@
 
 namespace Gameplay.Buff{
 	public class BuffPoison : BuffBase{
-		public BuffPoison(CharacterBase owner, int stack) : base(owner, stack){}
+		public BuffPoison(int id, CharacterBase owner, int stack) : base(id, owner, stack){}
 
 		public override void OnTurnIn(){
 			base.OnTurnIn();

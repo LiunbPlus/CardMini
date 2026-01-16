@@ -40,14 +40,17 @@ namespace Gameplay.Buffs.Editor{
 }";
 
 			//***********工厂
-			string facContent = @"using Gameplay.Character;
+			string facContent = @"using System;
+using Controller;
+using Gameplay.Character;
 namespace Gameplay.Buff{
 	public static class BuffFactory{
-		public static BuffBase Create(BuffType kind, CharacterBase c, int s){
+		public static BuffBase Create(int id, CharacterBase c, int s){
+			var kind = Enum.Parse<BuffType>(DataManager.BuffData[id].cls);
 			return kind switch{
 ";
 			foreach(Type t in actionTypes){
-				facContent += $"\t\t\t\tBuffType.{t.Name} => new {t.Name}(c,s),\n";
+				facContent += $"\t\t\t\tBuffType.{t.Name} => new {t.Name}(id,c,s),\n";
 			}
 
 			facContent += @"

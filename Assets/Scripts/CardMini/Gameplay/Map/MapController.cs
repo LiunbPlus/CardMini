@@ -11,11 +11,13 @@ namespace Gameplay.Map{
 		public event Action OnMapHide;
 
 		private Random _rng;
+		private readonly EnemyPoolManager _poolManager;
 		private readonly List<MapNode> _mapNodes;
 		private MapNode _curNode;
 
 		private MapController(){
 			_mapNodes = new();
+			_poolManager = new EnemyPoolManager();
 		}
 
 		public void SetRandomSeed(int seed){
@@ -32,24 +34,19 @@ namespace Gameplay.Map{
 			switch(node.NodeType){
 				default:
 				case MapNodeType.Enemy:
-					CombatController.Instance.EnterBattle();
-					break;
-				case MapNodeType.Treasure:
-					CombatController.Instance.EnterBattle();
+					CombatController.Instance.EnterBattle(_poolManager.GetRandomEnemyByPoolId(1));
 					break;
 				case MapNodeType.Shop:
-					CombatController.Instance.EnterBattle();
-					break;
-				case MapNodeType.Question:
-					CombatController.Instance.EnterBattle();
+					CombatController.Instance.EnterBattle(_poolManager.GetRandomEnemyByPoolId(1));
 					break;
 				case MapNodeType.Elite:
-					CombatController.Instance.EnterBattle();
+					CombatController.Instance.EnterBattle(_poolManager.GetRandomEnemyByPoolId(2));
 					break;
 				case MapNodeType.Boss:
-					CombatController.Instance.EnterBattle();
+					CombatController.Instance.EnterBattle(_poolManager.GetRandomEnemyByPoolId(3));
 					break;
 			}
+
 			OnMapHide?.Invoke();
 		}
 
@@ -64,17 +61,13 @@ namespace Gameplay.Map{
 		private void GenerateMap(){
 			var n7 = new MapNode(MapNodeType.Boss, null);
 			var n6 = new MapNode(MapNodeType.Shop, new List<MapNode>(){n7});
-			var n5 = new MapNode(MapNodeType.Question, new List<MapNode>(){n6});
-			var n4 = new MapNode(MapNodeType.Elite, new List<MapNode>(){n5});
-			var n3 = new MapNode(MapNodeType.Treasure, new List<MapNode>(){n4});
-			var n2 = new MapNode(MapNodeType.Enemy, new List<MapNode>(){n3});
+			var n4 = new MapNode(MapNodeType.Elite, new List<MapNode>(){n6});
+			var n2 = new MapNode(MapNodeType.Enemy, new List<MapNode>(){n4});
 			var n1 = new MapNode(MapNodeType.Enemy, new List<MapNode>(){n2});
 
 			_mapNodes.Add(n1);
 			_mapNodes.Add(n2);
-			_mapNodes.Add(n3);
 			_mapNodes.Add(n4);
-			_mapNodes.Add(n5);
 			_mapNodes.Add(n6);
 			_mapNodes.Add(n7);
 

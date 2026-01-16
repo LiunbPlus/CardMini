@@ -19,11 +19,13 @@ namespace Gameplay.Actions{
 		protected List<CharacterBase> target;
 		public readonly TargetType targetType;
 		protected readonly bool isSingleTarget;
-		protected readonly int value;
+		protected int value;
+		protected int count;
 
 		protected ActionBase(ActionData data){
 			_actionFlag = ActionFlag.None;
 			value = data.value;
+			count = data.count;
 			targetType = data.targetType;
 			isSingleTarget = targetType != TargetType.All;
 		}

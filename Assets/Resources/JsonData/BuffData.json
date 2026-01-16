@@ -1,0 +1,22 @@
+﻿{
+  "list" : [
+    {
+      "id" : 8001,
+      "cls" : "BuffPoison",
+      "name" : "中毒",
+      "desc" : "回合开始时，扣除{Stack}生命",
+      "maxStack" : 999,
+      "kind" : 3,
+      "img" : "Poison"
+    },
+    {
+      "id" : 8002,
+      "cls" : "BuffStrength",
+      "name" : "力量",
+      "desc" : "攻击力增加{Stack}",
+      "maxStack" : 999,
+      "kind" : 2,
+      "img" : "Strength"
+    }
+  ]
+}

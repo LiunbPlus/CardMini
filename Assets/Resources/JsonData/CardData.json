@@ -1,0 +1,39 @@
+﻿{
+  "list": [
+    {
+      "id": 1001,
+      "name": "打击1",
+      "desc": "<default>",
+      "cost": 1,
+      "cardType": 1,
+      "rarity": 2,
+      "anim": "Melee",
+      "img": "Attack1",
+      "actions": [
+        {
+          "type": "ActionDamage",
+          "value": 6,
+          "target": 2
+        }
+      ]
+    },
+    {
+      "id": 1002,
+      "name": "打击2",
+      "desc": "<default>",
+      "cost": 1,
+      "cardType": 2,
+      "rarity": 3,
+      "anim": "Melee",
+      "img": "Attack2",
+      "actions": [
+        {
+          "type": "ActionAddBuff",
+          "kind": 8001,
+          "value": 2,
+          "target": 1
+        }
+      ]
+    }
+  ]
+}

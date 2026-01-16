@@ -10,11 +10,9 @@ namespace Gameplay.Reward{
 
 		private List<CardBase> _rewards;
 		private readonly int _count;
-		private readonly int _rarity;
 
-		public CardReward(int x, int y){
+		public CardReward(int x, int w){
 			_count = x;
-			_rarity = y;
 		}
 
 		public List<CardBase> GetCardReward(){
@@ -24,17 +22,20 @@ namespace Gameplay.Reward{
 			int seed = GameManager.Instance.RandomSeed;
 			var random = new Random(seed);
 
-			var res = new List<CardBase>(_count);
-			List<int> ids = CardManager.GetAllCardIdByRarity((RarityType)_rarity);
-			HashSet<int> set = new();
+			var ids = new List<int>(DataManager.CardData.GetAllData().Keys);
 
+			if(ids.Count <= 3){
+				_rewards = new List<CardBase>(ids.Select(i => new CardBase(DataManager.CardData[ids[i]])));
+				return _rewards;
+			}
+
+			HashSet<int> set = new();
 			while(set.Count < _count){
 				int next = random.Next(0, ids.Count);
 				set.Add(next);
 			}
 
-			res.AddRange(set.Select(i => CardManager.GetCard(ids[i])));
-			_rewards = res;
+			_rewards = new List<CardBase>(set.Select(i => new CardBase(DataManager.CardData[ids[i]])));
 			return _rewards;
 		}
 

@@ -8,25 +8,25 @@ namespace Gameplay.Character{
 		public event Action<BuffBase> OnBuffChange;
 
 		private readonly CharacterBase _character;
-		private readonly Dictionary<BuffType, BuffBase> _buffs = new();
+		private readonly Dictionary<int, BuffBase> _buffs = new();
 		private readonly Dictionary<ModifierType, List<(BuffBase source, StatModifier modifier)>> _statModifiers = new();
 
-		public CharacterBuffController(CharacterBase characterBase, List<BuffType> passives = null){
+		public CharacterBuffController(CharacterBase characterBase, List<int> passives = null){
 			_character = characterBase;
 
 			if(passives == null) return;
-			foreach(BuffType kind in passives){
+			foreach(int kind in passives){
 				AddBuff(kind, 1);
 			}
 		}
 
 		#region Buff
-		public void AddBuff(BuffType type, int stack){
+		public void AddBuff(int type, int stack){
 			BuffBase buff = BuffFactory.Create(type, _character, stack);
 			AddBuff(type, buff);
 		}
 
-		private void AddBuff(BuffType type, BuffBase buff){
+		private void AddBuff(int type, BuffBase buff){
 			if(_buffs.TryGetValue(type, out var same)){
 				same.OnApplyRe();
 
@@ -40,27 +40,31 @@ namespace Gameplay.Character{
 			}
 		}
 
-		public void RemoveBuff(BuffType type){
+		public void RemoveBuff(int type){
 			if(!_buffs.TryGetValue(type, out var buff)) return;
 			buff.OnRemove();
 			_buffs.Remove(type);
 		}
 
 		public void ClearBuff(BuffKind targetKind){
-			List<BuffType> removedList = new();
-			foreach((BuffType key, BuffBase value) in _buffs){
+			List<int> removedList = new();
+			foreach((int key, BuffBase value) in _buffs){
 				if((value.BuffKind & targetKind) != 0){
 					removedList.Add(key);
 				}
 			}
 
-			foreach(BuffType kind in removedList){
+			foreach(int kind in removedList){
 				RemoveBuff(kind);
 			}
 		}
 
-		public BuffBase GetBuff(BuffType type){
+		public BuffBase GetBuff(int type){
 			return !_buffs.TryGetValue(type, out var buff) ? null : buff;
+		}
+
+		public bool ContainsBuff(int type){
+			return _buffs.ContainsKey(type);
 		}
 
 		internal void OnGameStart(){
@@ -69,15 +73,17 @@ namespace Gameplay.Character{
 			}
 		}
 
-		internal void OnTurnIn(){
+		internal void OnTurnIn(int t){
+			if(t != _character.Team) return;
 			foreach(var buff in _buffs.Values){
 				buff.OnTurnIn();
 			}
 		}
 
-		internal void OnTurnOut(){
-			List<BuffType> removedList = new();
-			foreach((BuffType kind, BuffBase buff) in _buffs){
+		internal void OnTurnOut(int t){
+			if(t != _character.Team) return;
+			List<int> removedList = new();
+			foreach((int kind, BuffBase buff) in _buffs){
 				buff.OnTurnOut();
 				if(buff.TickDuration()){
 					removedList.Add(kind);
@@ -86,7 +92,7 @@ namespace Gameplay.Character{
 				OnBuffChange?.Invoke(buff);
 			}
 
-			foreach(BuffType kind in removedList){
+			foreach(int kind in removedList){
 				RemoveBuff(kind);
 			}
 		}

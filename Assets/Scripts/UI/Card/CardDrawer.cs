@@ -1,10 +1,11 @@
 ﻿using System;
-using Controller;
 using Gameplay.Card;
 using TMPro;
+using UI.Combat.Character;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using DM = Controller.DataManager;
 
 namespace UI.Card{
 	public enum CardState{
@@ -21,7 +22,9 @@ namespace UI.Card{
 		[SerializeField] private Image cardImage;
 		[SerializeField] private Image cardBackImage;
 
+		protected override int OperateLayer => 0;
 		public event Action<CardDrawer> OnChoose;
+		public event Action<CardDrawer> OnClick;
 
 		public CardState CardState{get; private set;}
 		public CardBase CardBase{get; private set;}
@@ -29,18 +32,17 @@ namespace UI.Card{
 		public void SetCardBase(CardBase b, CardState state = CardState.Exhibit){
 			CardBase = b;
 			CardState = state;
-			Refresh();
-		}
+			if(b == null){
+				Hide();
+				return;
+			}
 
-		/// <summary>
-		/// 重新读取信息，重新绘制
-		/// </summary>
-		private void Refresh(){
+			Show();
 			cardName.text = CardBase.Name;
 			cardDescription.text = CardBase.Description;
 			cardCost.text = CardBase.Cost.ToString();
-			cardImage = CardImageManager.Instance.GetImage(CardBase.Id);
-			cardBackImage = DataManager.Instance.ImageData.GetData(CardBase.CardType.ToString()).image;
+			cardImage.sprite = CardImageManager.Instance.GetImage(CardBase.Id).sprite;
+			cardBackImage.sprite = DM.ImageData.GetData(CardBase.CardType.ToString()).image.sprite;
 		}
 
 		private void SetScale(float x){
@@ -50,14 +52,24 @@ namespace UI.Card{
 		public void OnDrag(PointerEventData eventData){}
 
 		public void OnPointerClick(PointerEventData eventData){
+			if(CardState == CardState.InHand){
+				// todo:test
+				CardState = CardState.InSlot;
+				ChooseCard(UI.CombatView.GetFirstValidSlot());
+			} else if(CardState==CardState.InSlot){
+				CardState = CardState.InHand;
+				UnChooseCard();
+
+			}
 			if(CardState == CardState.Reward){
-				// 加入卡组
-				PileController.Instance.AddToCardBag(CardBase);
+				OnClick?.Invoke(this);
 			}
 		}
 
-		private void ChooseCard(){
+		private void ChooseCard(CardSlotItem item){
 			CardState = CardState.InSlot;
+			var c = item.SetCard(this);
+			c.UnChooseCard();
 			// 选择特效
 			OnChoose?.Invoke(this);
 		}

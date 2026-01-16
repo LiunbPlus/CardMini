@@ -12,22 +12,16 @@ namespace Controller{
 		public event Action<int> OnTurnStart;
 		public event Action<int> OnTurnEnd;
 
-		private readonly Dictionary<int, int> _teams;
-		private readonly List<int> _teamIds;
-		private int _curTeamIndex;
-		private int CurTeamId => _teamIds[_curTeamIndex];
-		private int _curTurn;
+		private int _curTeam;
+		public int CurTurn{get; private set;}
 
-		private TurnController(){
-			_teams = new();
-			_teamIds = new();
-		}
+		private TurnController(){}
 
 		/// <summary>
 		/// 战斗开始
 		/// </summary>
 		public void BattleStart(){
-			_curTurn = 0;
+			CurTurn = 0;
 			OnBattleStart?.Invoke();
 		}
 
@@ -35,13 +29,13 @@ namespace Controller{
 		/// 下一回合
 		/// </summary>
 		public void NextTurn(){
-			OnTurnEnd?.Invoke(CurTeamId);
-			_curTeamIndex++;
-			if(_curTeamIndex >= _teamIds.Count){
-				_curTeamIndex = 0;
-				_curTurn++;
+			OnTurnEnd?.Invoke(_curTeam);
+			_curTeam++;
+			if(_curTeam > 1){
+				_curTeam = 0;
+				CurTurn++;
 			}
-			OnTurnStart?.Invoke(CurTeamId);
+			OnTurnStart?.Invoke(_curTeam);
 		}
 
 		/// <summary>
@@ -49,42 +43,6 @@ namespace Controller{
 		/// </summary>
 		public void BattleEnd(){
 			OnBattleEnd?.Invoke();
-		}
-
-		/// <summary>
-		/// 加入角色
-		/// </summary>
-		/// <param name="id">角色所在队伍id</param>
-		public void AddCharacter(int id){
-			if(!_teams.ContainsKey(id)) _teamIds.Add(id);
-			_teams[id]++;
-		}
-
-		/// <summary>
-		/// 获得唯一队伍ID
-		/// </summary>
-		/// <returns>若唯一返回id，若仍有其他队伍返回-1</returns>
-		public int CheckOnlyTeam(){
-			if(_teams.Keys.Count == 1) return _teams.Keys.ToArray()[0];
-			return -1;
-		}
-
-		/// <summary>
-		/// 删除角色
-		/// </summary>
-		/// <param name="id">角色所在队伍ID</param>
-		/// <returns>是否是该队最后一人</returns>
-		public bool RemoveCharacter(int id){
-			if(_teams.ContainsKey(id)){
-				_teams[id]--;
-				if(_teams[id] == 0){
-					_teams.Remove(id);
-					_teamIds.Remove(id);
-					return true;
-				}
-			}
-
-			return false;
 		}
 	}
 }

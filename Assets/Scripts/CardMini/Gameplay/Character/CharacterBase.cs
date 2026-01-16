@@ -1,16 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using Controller;
 using Core.Data;
+using Gameplay.Buff;
+using Gameplay.Card;
 
 namespace Gameplay.Character{
 	public abstract class CharacterBase{
+		public int Id{get; private set;}
 		public string Name{get; private set;}
 		public string Description{get; private set;}
+		public string ImagePath{get; private set;}
 		public int Health{get; private set;}
 		public int MaxHealth{get; private set;}
 		public int Defense{get; private set;}
-		public int MaxDefense{get; private set;}
 		/// 所属队伍，玩家=0，敌人=1
 		public int Team{get; protected set;}
+		public int SlotCount{get; private set;}
+		public List<CardBase> SlotCards{get; private set;}
 		public CharacterBuffController BuffController{get; private set;}
 
 		public event Action<CharacterBase> OnNameChange;
@@ -24,14 +31,31 @@ namespace Gameplay.Character{
 		public event Action<CharacterBase> OnDefenseEmpty;
 		public event Action<CharacterBase, CharacterBase> OnGiveDefenseEmpty;
 
+		private readonly TurnController _tc = TurnController.Instance;
+
 		protected CharacterBase(CharacterData data){
-			Name = data.cname;
-			Description = data.description;
-			MaxHealth = data.maxHealth;
-			Health = data.initHealth;
-			Defense = data.initDefense;
-			MaxDefense = data.maxDefense;
+			Id = data.id;
+			Name = data.name;
+			Description = data.desc;
+			ImagePath = data.img;
+			MaxHealth = data.maxHp;
+			Health = data.hp;
+			Defense = 0;
+			SlotCount = 3;
+			SlotCards = new List<CardBase>(SlotCount);
 			BuffController = new CharacterBuffController(this);
+
+			_tc.OnBattleStart += OnBattleStart;
+			_tc.OnBattleEnd += OnBattleEnd;
+			_tc.OnTurnStart += BuffController.OnTurnIn;
+			_tc.OnTurnEnd += BuffController.OnTurnOut;
+		}
+
+		public void Deposit(){
+			_tc.OnBattleStart -= OnBattleStart;
+			_tc.OnBattleEnd -= OnBattleEnd;
+			_tc.OnTurnStart -= BuffController.OnTurnIn;
+			_tc.OnTurnEnd -= BuffController.OnTurnOut;
 		}
 
 		public void ChangeName(string name){
@@ -42,6 +66,26 @@ namespace Gameplay.Character{
 		public void ChangeDescription(string d){
 			Description = d;
 			OnDescriptionChange?.Invoke(this);
+		}
+
+		public virtual void OnBattleStart(){
+			Defense = 0;
+			BuffController.ClearBuff(BuffKind.All);
+		}
+
+		public virtual void OnBattleEnd(){
+			Defense = 0;
+			BuffController.ClearBuff(BuffKind.All);
+		}
+
+		/// <summary>
+		/// 改变意图槽位数，清空持有卡牌（丢失引用！）
+		/// </summary>
+		/// <param name="amount">增量</param>
+		public void ChangeSlotCount(int amount){
+			SlotCount += amount;
+			if(SlotCount < 0) SlotCount = 0;
+			SlotCards = new List<CardBase>(SlotCount);
 		}
 
 		/// <summary>
@@ -92,7 +136,7 @@ namespace Gameplay.Character{
 			int potentialNewValue = originalValue + amount;
 
 			// 应用上下限
-			Defense = Math.Clamp(potentialNewValue, 0, MaxDefense);
+			Defense = Math.Clamp(potentialNewValue, 0, 999);
 
 			// 触发事件
 			int delta = Defense - originalValue;
